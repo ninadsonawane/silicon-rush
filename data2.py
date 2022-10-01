@@ -9,7 +9,7 @@ import pyttsx3
 #translates into the mentioned language
   
  # opening an image from the source path
-img = Image.open('new_cropped.jpeg')     
+img = Image.open('ab.jpeg')     
 img.show()
 # describes image format in the output
 print(img)                          
