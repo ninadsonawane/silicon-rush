@@ -1,0 +1,19 @@
+{
+    "name": "Ajit",
+    "patient_no": "12345",
+    "aadhaar_no": "968366896609",
+    "results": {
+        "Urea": 31.0,
+        "Creatinine": 1.35,
+        "Uric Acid": 5.8,
+        "Calcium, Total": 8.9,
+        "Phosphorous": 2.8,
+        "Alkaline Phosphatase (ALP)": 96.0,
+        "Total Protein": 3.83,
+        "Albumin": 1.49,
+        "A : G Ratio": 136.0,
+        "Sodium": 3.6,
+        "Potassium": 101.0,
+        "Chloride": 5.0
+    }
+}
