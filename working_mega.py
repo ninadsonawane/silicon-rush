@@ -12,6 +12,8 @@ import requests
 import imutils
 import pytesseract
 import json
+import csv
+
 
 url = "http://10.114.168.71:8080/shot.jpg"
 pytesseract.pytesseract.tesseract_cmd ='C:/Program Files/Tesseract-OCR/tesseract.exe' 
@@ -204,7 +206,7 @@ def get_text():
     #img = cv2.cvtColor(final_image, cv2.COLOR_BGR2RGB)
     #img_pil = Image.fromarray(img)
     # converts the image to result and saves it into result variable
-    final_image.show()
+    # final_image.show()
     result = pytesseract.image_to_string(final_image)
 
     lines = result.split('\n')
@@ -217,13 +219,37 @@ def get_text():
     units = lines[list_len*2:list_len*3]
     reference = lines[list_len*3:list_len*4]
 
+
+        
+    # field names 
+    fields = ['Test', 'Test Value', 'Unit', 'Range'] 
+    
+    rows = []
+
+    # name of csv file 
+    filename = "data.csv"
+    
     test_results = {}
     for i in range(list_len):
+        rows.append([test_name[i], results[i], units[i], reference[i]])
         test_results[test_name[i]] = {
             'value': results[i],
             'unit': units[i],
             'reference': reference[i]
         }
+        
+        
+    # writing to csv file 
+    with open(filename, 'w') as csvfile: 
+        # creating a csv writer object 
+        csvwriter = csv.writer(csvfile) 
+            
+        # writing the fields 
+        csvwriter.writerow(fields) 
+            
+        # writing the data rows 
+        csvwriter.writerows(rows)
+
 
     new_list = []
     for i in range(list_len):
@@ -234,11 +260,13 @@ def get_text():
 
     patient_details['results'] = test_results
     json_data = json.dumps(patient_details, indent=4)
+
     print(json_data)
     with open('./node/db.json', 'w') as outfile:
         outfile.write(json_data)
 
     frame.destroy()
+    root.destroy()
 
 def capture_form():
     global final_image
@@ -421,6 +449,9 @@ def controls_window(w,h):
     # print(w,h)
     # w=400
     # h=300
+
+    w *= 2
+    h *= 2
 
     left_lb = Label(controls, text='Left')
     left_lb.pack(anchor=W, pady=5)
