@@ -1,6 +1,10 @@
 
+
+
+
 # imports
 from tkinter import *
+import tkinter.filedialog as tk_file
 from PIL import Image, ImageTk
 import cv2
 import numpy as np
@@ -9,7 +13,7 @@ import imutils
 import pytesseract
 import json
 
-url = "http://25.198.222.22:8080/shot.jpg"
+url = "http://10.114.168.71:8080/shot.jpg"
 pytesseract.pytesseract.tesseract_cmd ='C:/Program Files/Tesseract-OCR/tesseract.exe' 
 
 data = {}
@@ -197,80 +201,41 @@ patient_details = {}
 hospital_details = {}
 
 def get_text():
-    img = cv2.cvtColor(final_image, cv2.COLOR_BGR2RGB)
-    img_pil = Image.fromarray(img)
+    #img = cv2.cvtColor(final_image, cv2.COLOR_BGR2RGB)
+    #img_pil = Image.fromarray(img)
     # converts the image to result and saves it into result variable
-    result = pytesseract.image_to_string(img_pil)
+    final_image.show()
+    result = pytesseract.image_to_string(final_image)
 
-    with open('abc.txt',mode ='w') as file:     
-        file.write(result)
-
-    result = result.replace(',', '.')
     lines = result.split('\n')
-    print(result)
+    lines = list(filter(None, lines))
 
-    labels = [
-        'Urea',
-        'Creatinine',
-        'Uric Acid',
-        'Calcium, Total',
-        'Phosphorous',
-        'Alkaline Phosphatase (ALP)',
-        'Total Protein',
-        'Albumin',
-        'A : G Ratio',
-        'Sodium',
-        'Potassium',
-        'Chloride'
-    ]
+    list_len = int(len(lines)/4)
 
+    test_name = lines[:list_len]
+    results = lines[list_len:list_len*2]
+    units = lines[list_len*2:list_len*3]
+    reference = lines[list_len*3:list_len*4]
 
-    def is_float(n):
-        try:
-            float(n)
-        except ValueError:
-            return False
-        return True
+    test_results = {}
+    for i in range(list_len):
+        test_results[test_name[i]] = {
+            'value': results[i],
+            'unit': units[i],
+            'reference': reference[i]
+        }
 
-    def is_special(line):
-        #if '-' in line:
-        #    return False
-        words = line.split()
-        for word in words:
-            if is_float(word):
-                return True
-        return False
-
-    special_lines = []
-
-    for line in lines:
-        if not len(line.strip()):
-            continue
-        if is_special(line):
-            special_lines.append(line)
-        #else:
-        #    special_lines = []
-            if len(special_lines) == len(labels) + 1:
-                break
-
-    values = []
-    for line in special_lines:
-        print(line)
-        for word in line.split():
-            if is_float(word):
-                values.append(float(word))
-                break
-
-    print('values', values)
-    results = {}
-    for i in range(min(len(labels), len(values)+1)):
-        results[labels[i]] = values[i+1]
+    new_list = []
+    for i in range(list_len):
+        new_list.append( test_name[i] + " " + results[i] + " " + units[i] + " " + reference[i])
+    
+    print(test_results)
 
 
-    patient_details['results'] = results
+    patient_details['results'] = test_results
     json_data = json.dumps(patient_details, indent=4)
     print(json_data)
-    with open('Adetails.json', 'w') as outfile:
+    with open('./node/db.json', 'w') as outfile:
         outfile.write(json_data)
 
     frame.destroy()
@@ -282,19 +247,19 @@ def capture_form():
         command=display_webcam)
     retake_button.pack()
     submit_button['text'] = 'Confirm'
-    submit_button['command'] = get_text
+    submit_button['command'] = crop_window
     frame.after_cancel(image_update)
 
     #pil_image = ImageTk.getimage(imgtk)
     #image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
     #cv2.imwrite("D:\hackathon\Silicon Rush" + "\letsImage2.jpg", image)
     image = original_img
-    cv2.imshow("IMG",image)
+    # cv2.imshow("IMG",image)
 
-    blurred_threshold = transformation(image)
-    cv2.imshow("blurred",blurred_threshold)
-    cleaned_image = final_image(blurred_threshold)
-    cv2.imshow("cleaned", cleaned_image)
+    #blurred_threshold = transformation(image)
+    #cv2.imshow("blurred",blurred_threshold)
+    cleaned_image = final_image(image)
+    # cv2.imshow("cleaned", cleaned_image)
 
     final_image = cleaned_image
     cv2.imwrite("D:\hackathon\Silicon Rush" + "\letsssImage.jpg", cleaned_image)
@@ -402,8 +367,190 @@ def put_authorization():
         command=(lambda e = ents: authorize(e)))
     capture_button.pack()
 
+
+
+
+# def crop_image(left,top,right,bottom):
+#     print(left, top, bottom, right)
+#     global edited_images, opened_image
+
+    
+
+#     print('entered')ed
+
+#     img = cv2.cvtColor(final_image, cv2.COLOR_BGR2RGB)
+
+#     edit_img = Image.fromarray(img)
+
+#     image_width, image_height = edit_img.size
+
+#     edited_images = edit_img.crop((left,top,image_width - right,image_height - bottom))
+#     edited_images.save("edited.jpeg")
+#     opened_images = ImageTk.PhotoImage(edited_images)
+
+
+#     image_lb.config(image = opened_images)
+
+def clear_image():
+    global opened_image, image_path,image_height,image_width
+
+    opened_image = ''
+    image_path = ''
+    image_height = 0
+    image_width = 0
+
+def confirm_image():
+    global final_image
+
+    #print(edited_image)
+    #if not edited_image:
+    #    edited_image = Image.open(image_path)
+    if edited_image == '':
+        img = cv2.cvtColor(final_image, cv2.COLOR_BGR2RGB)
+        img_pil = Image.fromarray(img)
+        final_image = img_pil
+    else:
+        final_image = edited_image
+    get_text()
+
+
+def controls_window(w,h):
+    controls = Toplevel(root)
+    controls.geometry('400x300')
+
+    # print(w,h)
+    # w=400
+    # h=300
+
+    left_lb = Label(controls, text='Left')
+    left_lb.pack(anchor=W, pady=5)
+
+    left_scale = Scale(controls, from_=0, to=w, orient=HORIZONTAL,
+                          command = lambda x: crop_image(left_scale.get(),
+                                   top_scale.get(),
+                                   right_scale.get(),
+                                   bottom_scale.get()))
+    left_scale.pack(anchor=W, fill=X)
+
+    right_lb = Label(controls, text='Right')
+    right_lb.pack(anchor=W, pady=5)
+
+    right_scale = Scale(controls, from_=0, to=w, orient=HORIZONTAL, 
+                           command = lambda x: crop_image(left_scale.get(),
+                                   top_scale.get(),
+                                   right_scale.get(),
+                                   bottom_scale.get()))
+    right_scale.pack(anchor=W, fill=X)
+
+    top_lb = Label(controls, text='Top')
+    top_lb.pack(anchor=W, pady=5)
+
+    top_scale = Scale(controls, from_=0, to=h, orient=HORIZONTAL, 
+                         command = lambda x: crop_image(left_scale.get(),
+                                   top_scale.get(),
+                                   right_scale.get(),
+                                   bottom_scale.get()))
+    top_scale.pack(anchor=W, fill=X)
+
+    bottom_lb = Label(controls, text='Bottom ')
+    bottom_lb.pack(anchor=W, pady=5)
+
+    bottom_scale = Scale(controls, from_=0, to=h, orient=HORIZONTAL,
+                            command = lambda x: crop_image(left_scale.get(),
+                                   top_scale.get(),
+                                   right_scale.get(),
+                                   bottom_scale.get()))
+    bottom_scale.pack(anchor=W, fill=X)
+
+def save_image():
+    if image_path:
+        file_name = tk_file.asksaveasfilename()
+
+        if file_name:
+            edited_image.save(file_name)
+
+def crop_image(left,top,right,bottom):
+    global edited_image, opened_image
+
+    print(image_path)
+    edit_img = Image.open(image_path)
+    image_width = edit_img.width
+    image_height = edit_img.height
+    edited_image = edit_img.crop((left,top,image_width - right,image_height - bottom))
+    
+    h = edited_image.height
+    w = edited_image.width 
+
+    reduced_preview = edited_image.resize((int(w*0.3), int(h*0.3)))
+    opened_image = ImageTk.PhotoImage(reduced_preview)
+
+
+    image_lb.config(image = opened_image)
+
+def open_image():
+    global opened_image,image_path, image_height,image_width
+
+    image_path = tk_file.askopenfilename()
+
+    if image_path:
+        img = Image.open(image_path)
+        w = img.width 
+        h = img.height
+        img = img.resize((int(w*0.3), int(h*0.3)))
+        opened_image = ImageTk.PhotoImage(img)
+        image_lb.config(image=opened_image)
+
+        image_height = opened_image.height()
+        image_width = opened_image.width()
+
+def load_image():
+    global opened_image,image_path, image_height,image_width
+
+    color_coverted = cv2.cvtColor(final_image, cv2.COLOR_BGR2RGB)
+    pil_image = Image.fromarray(color_coverted)
+    image_path = 'myfile.png'
+    pil_image.save(image_path)
+
+    w = pil_image.width
+    h = pil_image.height
+    pil_image = pil_image.resize((int(w*0.3), int(h*0.3)))
+    opened_image = ImageTk.PhotoImage(pil_image)
+    
+    image_lb.config(image=opened_image)
+
+    image_height = opened_image.height()
+    image_width = opened_image.width()
+
+def crop_window():
+    global opened_image, edited_image, image_height, image_width, image_lb
+
+    frame.destroy()
+
+    root.geometry('800x600')
+    root.config(bg="black")
+
+    opened_image=''
+    edited_image = ''
+
+    image_height = 0
+    image_width = 0
+
+    menu_bar = Menu(root)
+    menu_bar.add_command(label = "Open", command=open_image)
+    menu_bar.add_command(label = "Controls", command=lambda: controls_window(w=image_width, h = image_height))
+    menu_bar.add_command(label = "Confirm_Crop", command= confirm_image)
+    menu_bar.add_command(label = "Clear", command=clear_image)
+
+    root.config(menu = menu_bar)
+
+    image_lb = Label(root, bg='gray')
+    image_lb.pack(fill=BOTH)
+
+    load_image()
+
+
 if __name__ == '__main__':
-    global frame
+    global frame, root
     root = Tk()
     root.title('Report Details')
     frame = Frame(root)

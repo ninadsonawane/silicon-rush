@@ -1,0 +1,62 @@
+{
+    "name": "Ajit",
+    "patient_no": "158",
+    "aadhaar_no": "999865485589",
+    "results": {
+        "Urea": {
+            "value": "Chloride",
+            "unit": "4.00",
+            "reference": "mEq/L"
+        },
+        "Creatinine": {
+            "value": "35.00",
+            "unit": "97.00",
+            "reference": "mEq/L"
+        },
+        "Uric Acid": {
+            "value": "1.25",
+            "unit": "mg/dL",
+            "reference": "14.9 - 38.5"
+        },
+        "Calcium, Total": {
+            "value": "4.50",
+            "unit": "mg/dL",
+            "reference": "0.8 - 1.3"
+        },
+        "Phosphorus": {
+            "value": "9.00",
+            "unit": "mg/dL",
+            "reference": "3.5-7.2"
+        },
+        "Alkaline Phosphatase (ALP)": {
+            "value": "3.80",
+            "unit": "mg/dL",
+            "reference": "8.50 - 10.10"
+        },
+        "Total Protein": {
+            "value": "143",
+            "unit": "mg/dL",
+            "reference": "2.50 - 4.90"
+        },
+        "Albumin": {
+            "value": "7.18",
+            "unit": "U/L",
+            "reference": "50 - 136"
+        },
+        "A: G Ratio": {
+            "value": "3.92",
+            "unit": "g/dL",
+            "reference": "6.40 - 8.20"
+        },
+        "Sodium": {
+            "value": "1.20",
+            "unit": "g/dL",
+            "reference": "3.4 - 5.0"
+        },
+        "Potassium": {
+            "value": "132.00",
+            "unit": "mEq/L",
+            "reference": "0.90 - 2.00"
+        }
+    }
+}

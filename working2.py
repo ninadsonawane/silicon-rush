@@ -286,9 +286,9 @@ def capture_form():
     image = original_img
     cv2.imshow("IMG",image)
 
-    blurred_threshold = transformation(image)
-    cv2.imshow("blurred",blurred_threshold)
-    cleaned_image = final_image(blurred_threshold)
+    # blurred_threshold = transformation(image)
+    # cv2.imshow("blurred",blurred_threshold)
+    cleaned_image = final_image(image)
     cv2.imshow("cleaned", cleaned_image)
 
     final_image = cleaned_image
