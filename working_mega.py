@@ -14,6 +14,8 @@ import pytesseract
 import json
 import csv
 
+from pyexcel.cookbook import merge_all_to_a_book
+import glob
 
 url = "http://10.114.168.71:8080/shot.jpg"
 pytesseract.pytesseract.tesseract_cmd ='C:/Program Files/Tesseract-OCR/tesseract.exe' 
@@ -250,6 +252,7 @@ def get_text():
         # writing the data rows 
         csvwriter.writerows(rows)
 
+    merge_all_to_a_book(glob.glob("data.csv"), "output.xlsx")
 
     new_list = []
     for i in range(list_len):
